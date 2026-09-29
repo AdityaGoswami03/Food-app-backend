@@ -1,12 +1,14 @@
 import "dotenv/config";
-import express, { json } from "express";
+import express from "express";
+import cors from "cors";
 import connectDB from "./db.js";
 import { Item } from "./schema/FoodDetails.js";
-// import { User } from "./schema/User.schema.js";
 import userRoutes from "./routes/User.routes.js";
+
 const app = express();
+app.use(cors());
 app.use(express.json());
-const port = 9090;
+const port = process.env.PORT || 9090;
 
 // connect to MongoDB
 connectDB();

@@ -1,20 +1,18 @@
 import { Router } from "express";
-import { User } from "../schema/User.schema.js";
+import {
+  createUser,
+  loginUser,
+  getUserProfile,
+} from "../controllers/User.controller.js";
+import { authenticateToken } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.post("/create-user", async (req, res) => {
-  try {
-    await User.create({
-      name: req.body.name,
-      password: req.body.password,
-      email: req.body.email,
-    });
-    console.log("We have created");
-    res.json({ success: true });
-  } catch (error) {
-    console.log("error", error);
-    res.json({ success: false });
-  }
-});
+// Public routes
+router.post("/create-user", createUser);
+router.post("/login", loginUser);
+
+// Protected routes (require valid JWT token)
+router.get("/get-user", authenticateToken, getUserProfile);
+
 export default router;
