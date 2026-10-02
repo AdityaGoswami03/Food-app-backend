@@ -5,7 +5,7 @@ import { generateToken } from "../middleware/auth.middleware.js";
 /**
  * Service to handle User registration / creation
  */
-export const createUserService = async ({ name, email, password }) => {
+export const createUserService = async ({ name, email, password, role }) => {
   // Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -23,12 +23,14 @@ export const createUserService = async ({ name, email, password }) => {
     name,
     email,
     password: hashedPassword,
+    role: role || "user",
   });
 
   return {
     id: newUser._id,
     name: newUser.name,
     email: newUser.email,
+    role: newUser.role,
   };
 };
 
@@ -52,10 +54,11 @@ export const loginUserService = async ({ email, password }) => {
     throw error;
   }
 
-  // Generate JWT token using middleware helper
+  // Generate JWT token using middleware helper (embed role)
   const authToken = generateToken({
     id: user._id,
     email: user.email,
+    role: user.role || "user",
   });
 
   return {
@@ -64,6 +67,7 @@ export const loginUserService = async ({ email, password }) => {
       id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role || "user",
     },
   };
 };

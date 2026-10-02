@@ -9,7 +9,7 @@ import {
  */
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -18,7 +18,7 @@ export const createUser = async (req, res) => {
       });
     }
 
-    const createdUser = await createUserService({ name, email, password });
+    const createdUser = await createUserService({ name, email, password, role });
 
     return res.status(201).json({
       success: true,

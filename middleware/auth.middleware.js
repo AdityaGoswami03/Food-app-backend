@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "default_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 /**
  * Helper to generate JWT Token
@@ -37,10 +37,10 @@ export const authenticateToken = (req, res, next) => {
 
     // Verify token
     const decoded = jwt.verify(token, JWT_SECRET);
-    
+
     // Attach decoded user info to request object
     req.user = decoded;
-    
+
     next();
   } catch (error) {
     console.error("JWT verification failed:", error.message);
@@ -49,4 +49,17 @@ export const authenticateToken = (req, res, next) => {
       message: "Invalid or expired token.",
     });
   }
+};
+
+/**
+ * Middleware to restrict access to admin users only
+ */
+export const authorizeAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access forbidden. Admin privileges required.",
+    });
+  }
+  next();
 };

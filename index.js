@@ -1,13 +1,20 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import path from "path";
 import connectDB from "./db.js";
 import { Item } from "./schema/FoodDetails.js";
 import userRoutes from "./routes/User.routes.js";
+import foodRoutes from "./routes/Food.routes.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded images statically
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 const port = process.env.PORT || 9090;
 
 // connect to MongoDB
@@ -24,8 +31,18 @@ app.get("/", async (req, res) => {
   }
 });
 
-// app.use("/api", User);
+// Routes
 app.use("/api", userRoutes);
+app.use("/api/food", foodRoutes);
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err.message);
+  return res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal server error",
+  });
+});
 
 app.listen(port, () => {
   console.log(`✅ Example app listening on port ${port}`);
